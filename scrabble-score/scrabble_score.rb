@@ -3,12 +3,11 @@
 #
 # To get started with TDD, see the `README.md` file in your
 # `ruby/scrabble-score` directory.
-require 'pry'
 class Scrabble
   attr_reader :word
 
   def initialize(word)
-    @word = word&.strip&.downcase || ''
+    @word = word&.strip&.upcase || ''
   end
 
   def score
@@ -17,29 +16,22 @@ class Scrabble
     @score ||=
       begin
         score = 0
-        word.each_char do |ch|
-          score += letter_scores[ch]
+        letter_values.each do |letters, value|
+          score += word.scan(letters).count * value
         end
         score
       end
   end
 
-  def letter_scores
-    @letter_scores ||=
-      letter_values.each_with_object({}) do |(arr, v), h|
-        arr.each { |k| h[k] = v }
-      end
-  end
-
   def letter_values
     @letter_values ||= {
-      %w[a e i o u l n r s t] => 1,
-      %w[d g] => 2,
-      %w[b c m p] => 3,
-      %w[f h v w y] => 4,
-      %w[k] => 5,
-      %w[j x] => 8,
-      %w[q z] => 10
+      /[AWEIOULNRST]/ => 1,
+      /[DG]/ => 2,
+      /[BCMP]/ => 3,
+      /[FHVWY]/ => 4,
+      /[K]/ => 5,
+      /[JX]/ => 8,
+      /[QZ]/ => 10
     }
   end
 
